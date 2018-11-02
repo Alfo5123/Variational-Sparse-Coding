@@ -15,11 +15,15 @@ parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
+parser.add_argument('--fashion', action='store_true', default=False,
+                    help='use fashion-mnist instead of mnist')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
+
 args = parser.parse_args()
+print("VAE Baseline Experiments\n")
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
 torch.manual_seed(args.seed)
@@ -28,23 +32,40 @@ device = torch.device("cuda" if args.cuda else "cpu")
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
-train_loader = torch.utils.data.DataLoader(
-    datasets.FashionMNIST('../data/fashion-mnist', train=True, download=False,
-                   transform=transforms.ToTensor()),
-    batch_size=args.batch_size, shuffle=True, **kwargs)
-test_loader = torch.utils.data.DataLoader(
-    datasets.FashionMNIST('../data/fashion-mnist', train=False, transform=transforms.ToTensor()),
-    batch_size=args.batch_size, shuffle=True, **kwargs)
+#Load datasets
+if args.fashion :
+
+    print("Loading Fashion-MNIST dataset...")
+    train_loader = torch.utils.data.DataLoader(
+        datasets.FashionMNIST('../data/fashion-mnist', train=True, download=False,
+                       transform=transforms.ToTensor()),
+        batch_size=args.batch_size, shuffle=True, **kwargs)
+    test_loader = torch.utils.data.DataLoader(
+        datasets.FashionMNIST('../data/fashion-mnist', train=False, transform=transforms.ToTensor()),
+        batch_size=args.batch_size, shuffle=True, **kwargs)
+    print("Done!\n")
+
+else:
+
+    print("Loading MNIST dataset...")
+    train_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('../data/mnist', train=True, download=False,
+                       transform=transforms.ToTensor()),
+        batch_size=args.batch_size, shuffle=True, **kwargs)
+    test_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('../data/mnist', train=False, transform=transforms.ToTensor()),
+        batch_size=args.batch_size, shuffle=True, **kwargs)
+    print("Done!\n")
+
 
 
 class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
-
         self.fc1 = nn.Linear(784, 400)
-        self.fc21 = nn.Linear(400, 20)
-        self.fc22 = nn.Linear(400, 20)
-        self.fc3 = nn.Linear(20, 400)
+        self.fc21 = nn.Linear(400, 200)
+        self.fc22 = nn.Linear(400, 200)
+        self.fc3 = nn.Linear(200, 400)
         self.fc4 = nn.Linear(400, 784)
 
     def encode(self, x):
@@ -66,13 +87,16 @@ class VAE(nn.Module):
         return self.decode(z), mu, logvar
 
 
+#Define model 
 model = VAE().to(device)
+
+# Tune the learning rate ( All training rates used were between 0.001 and 0.01)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 
 # Reconstruction + KL divergence losses summed over all elements and batch
 def loss_function(recon_x, x, mu, logvar):
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784))
 
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
@@ -116,18 +140,24 @@ def test(epoch):
                 n = min(data.size(0), 8)
                 comparison = torch.cat([data[:n],
                                       recon_batch.view(args.batch_size, 1, 28, 28)[:n]])
-                save_image(comparison.cpu(),
-                         'results/reconstruction_' + str(epoch) + '.png', nrow=n)
+
+                if args.fashion:
+                    save_image(comparison.cpu(),
+                             'results/reconstruction_fashion' + str(epoch) + '.png', nrow=n)
+                else:
+                    save_image(comparison.cpu(),
+                         'results/reconstruction_mnist' + str(epoch) + '.png', nrow=n)
 
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
 
 if __name__ == "__main__":
+
+    print("Training model...")
     for epoch in range(1, args.epochs + 1):
         train(epoch)
         test(epoch)
         with torch.no_grad():
-            sample = torch.randn(64, 20).to(device)
+            sample = torch.randn(64, 200).to(device)
             sample = model.decode(sample).cpu()
-            save_image(sample.view(64, 1, 28, 28),
-'results/sample_' + str(epoch) + '.png')
+            #save_image(sample.view(64, 1, 28, 28),'results/sample_' + str(epoch) + '.png')
