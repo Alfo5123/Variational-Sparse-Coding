@@ -1,6 +1,7 @@
 from __future__ import print_function
 import argparse
 import torch
+from glob import glob
 import torch.utils.data
 from torch import nn, optim
 from torch.nn import functional as F
@@ -11,7 +12,7 @@ from torchvision.utils import save_image
 parser = argparse.ArgumentParser(description='VAE MNIST Example')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
+parser.add_argument('--epochs', type=int, default=100, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -21,6 +22,8 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
+parser.add_argument('--report-interval', type=int, default=50, metavar='N',
+                    help='how many epochs to wait before storing training status')
 
 args = parser.parse_args()
 print("VAE Baseline Experiments\n")
@@ -138,6 +141,8 @@ def test(epoch):
             data = data.to(device)
             recon_batch, mu, logvar = model(data)
             test_loss += loss_function(recon_batch, data, mu, logvar).item()
+
+            ## Plot reconstruction comparison
             if i == 0:
                 n = min(data.size(0), 8)
                 comparison = torch.cat([data[:n],
@@ -150,16 +155,56 @@ def test(epoch):
                     save_image(comparison.cpu(),
                          'results/reconstruction_mnist' + str(epoch) + '.png', nrow=n)
 
+
+
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
 
+
+def load_last_model():
+
+    # Auxiliary function to continue training from last model trained
+
+    models = glob('models/*.pth')
+    model_ids = [(int(f.split('_')[2]), f) for f in models]
+
+    # If no pretrained model 
+    if len(model_ids) == 0 :
+        print('Training Model from scratch...')
+        return 1, -1
+
+    # Load model from last checkpoint 
+    start_epoch, last_cp = max(model_ids, key=lambda item:item[0])
+    print('Last checkpoint: ', last_cp)
+    model.load_state_dict(torch.load(last_cp))
+    print('Loading model from last checkpoint...')
+
+    return start_epoch, last_cp
+
 if __name__ == "__main__":
 
+    start_epoch, last_cp = load_last_model()
+
     print("Training model...")
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch , start_epoch + args.epochs + 1):
+
         train(epoch)
         test(epoch)
-        with torch.no_grad():
-            sample = torch.randn(64, 200).to(device)
-            sample = model.decode(sample).cpu()
-            #save_image(sample.view(64, 1, 28, 28),'results/sample_' + str(epoch) + '.png')
+
+        # For each report interval store model and save images
+
+        if epoch % args.report_interval == 0:
+
+            with torch.no_grad():
+
+                ## Plot Samples
+                sample = torch.randn(64, 200).to(device)
+                sample = model.decode(sample).cpu()
+                save_image(sample.view(64, 1, 28, 28),'results/sample_' + str(epoch) + '_.png')
+
+                ## Store Model
+                if args.fashion:
+                    torch.save(model.cpu().state_dict(), "models/vae_fashion_"+str(epoch)+"_.pth")
+                else:
+                    torch.save(model.cpu().state_dict(), "models/vae_mnist_"+str(epoch)+"_.pth")
+            
