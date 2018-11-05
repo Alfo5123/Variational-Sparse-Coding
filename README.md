@@ -22,14 +22,38 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 ## Results
 
-
 ## Usage
+
+### Set up
+
+>Requires Python 3.0 or higher.
+
+The following lines will clone the repository and install all the required dependencies.
+
 ```
-https://github.com/Alfo5123/Variational-Sparse-Coding.git
-cd Variational-Sparse-Coding
-pip install -r requirements.txt
+$ https://github.com/Alfo5123/Variational-Sparse-Coding.git
+$ cd Variational-Sparse-Coding
+$ pip install -r requirements.txt
 ```
 
+### Datasets
+
+In order to download datasets used in the paper experiments we use
+```
+$ python setup.py [datasets...]
+```
+
+with options `mnist`, `fashion` and `celeba`. For example, if case you want to replicate *all* the experiments in the paper, we must run the following line:
+
+```
+$ python setup.py mnist fashion celeba
+```
+
+It will download and store the datasets locally in the **data** folder. 
+
+### Pretrained Models
+
+Aiming to simplify the reproducibility research process, we store the checkpoints of the trained models in **models** within the **src** folder. In addition, we include a folder **results** to collect visualizations for different checkpoints. 
 
 ## References
 
