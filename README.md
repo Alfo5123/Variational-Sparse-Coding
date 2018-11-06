@@ -8,6 +8,7 @@ We aim to replicate the experiments described in the paper ["Variational Sparse 
 - [Authors](#authors)
 - [Results](#results)
 - [Usage](#usage)
+- [Observations](#observations)
 - [References](#references)
 - [License](#license)
 
@@ -53,7 +54,29 @@ It will download and store the datasets locally in the **data** folder.
 
 ### Pretrained Models
 
-Aiming to simplify the reproducibility research process, we store the checkpoints of the trained models in **models** within the **src** folder. In addition, we include a folder **results** to collect visualizations for different checkpoints. 
+Aiming to simplify the reproducibility research process, we store the checkpoints of the trained models in **models** within the **src** folder. In addition, we include a folder **results** to collect visualizations for different checkpoints.
+
+### Train Models 
+
+```
+$ cd src
+$ python [model] [args] 
+```
+
+For example
+
+```
+$ python vae_mnist.py --epochs 500 --report-interval 50 --lr 0.01 
+```
+
+```
+$ python vsc_mnist.py --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01 --fashion
+```
+
+## Observations
+- [ ] Typo ? Difference between formula 6 and 9 / 21 signs
+- [ ] How gradually show we increase c? Linearly for 20k iterations?
+- [ ] Equation 10 : Recognition function,  numerical inestability -ReLU( -Vout ) = 0 -> spike = 1 
 
 ## References
 
