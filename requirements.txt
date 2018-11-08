@@ -1,5 +1,8 @@
-tqdm==4.19.5
-torchvision==0.2.1
-torch==0.4.0
-requests==2.20.0
+tensorflow==1.6.0
+scipy==1.1.0
 six==1.11.0
+torch==0.4.0
+torchvision==0.2.1
+tqdm==4.19.5
+requests==2.20.0
+numpy==1.15.3
