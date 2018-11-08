@@ -22,12 +22,10 @@ class Logger(object):
     def scalar_summary(self, train_loss, test_loss, step):
         """Log a scalar variable."""
 
-        #summary = tf.Summary(value=[tf.Summary.Value(tag='train', simple_value=train_loss)])
         summary = self.session.run(self.merged, {self.loss: train_loss})
         self.train_writer.add_summary(summary, step) 
         self.train_writer.flush()
 
-        #summary = tf.Summary(value=[tf.Summary.Value(tag='eval', simple_value=test_loss)])
         summary = self.session.run(self.merged, {self.loss: test_loss})
         self.test_writer.add_summary(summary, step) 
         self.test_writer.flush()
