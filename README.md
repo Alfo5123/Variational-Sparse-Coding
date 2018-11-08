@@ -73,6 +73,12 @@ $ python vae_mnist.py --epochs 500 --report-interval 50 --lr 0.01
 $ python vsc_mnist.py --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01 --fashion
 ```
 
+To visualize training results in TensorBoard, we can use the following command from a new terminal within **src** folder. 
+
+```
+$ tensorboard --logdir='./logs' --port=6006
+```
+
 ## Observations
 - [ ] Typo ? Difference between formula 6 and 9 / 21 signs
 - [ ] How gradually show we increase c? Linearly for 20k iterations?
