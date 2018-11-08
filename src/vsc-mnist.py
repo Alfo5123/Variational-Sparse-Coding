@@ -8,6 +8,7 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
+from logger import Logger
 
 
 parser = argparse.ArgumentParser(description='VSC MNIST Example')
@@ -19,7 +20,7 @@ parser.add_argument('--lr', default=1e-3, type=float, metavar='LR',
                     help='initial learning rate')
 parser.add_argument('--alpha', default=0.01, type=float, metavar='A', 
                     help='value of spike variable (default: 1.0')
-parser.add_argument('--epochs', type=int, default=100, metavar='N',
+parser.add_argument('--epochs', type=int, default=500, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -154,6 +155,8 @@ def train(epoch):
     print('====> Epoch: {} Average loss: {:.4f}'.format(
           epoch, train_loss / len(train_loader.dataset)))
 
+    return train_loss / len( train_loader.dataset)
+
 # Returns the VLB for the test set
 def test(epoch):
     model.eval()
@@ -168,6 +171,8 @@ def test(epoch):
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f} - VLB-VSC : {:.4f} '.format(test_loss, VLB))
 
+    return test_loss
+
 
 #Auxiliary function to continue training from last model trained
 def load_last_model():
@@ -179,10 +184,10 @@ def load_last_model():
         if f.split('_')[0][-3:] == 'vsc':
             if args.fashion:
                 if f.split('_')[1] == 'fashion':
-                    model_ids.append( (int(f.split('_')[2]), f) ) 
+                    model_ids.append( (int(f.split('_')[-2]), f) ) 
             else:
                 if f.split('_')[1] == 'mnist':
-                    model_ids.append( (int(f.split('_')[2]), f) )
+                    model_ids.append( (int(f.split('_')[-2]), f) )
 
     # If no checkpoint available
     if len(model_ids) == 0 :
@@ -199,19 +204,34 @@ def load_last_model():
 
 if __name__ == "__main__":
 
+    #Load model weights from latest checkpoint
     start_epoch = load_last_model()
+
+    # Store log characteristic name for each run
+    #> model_dataset_startepoch_numepochs_latent_lr
+    if args.fashion:
+        run_name = 'vsc_fashion_' + str(start_epoch) + '_' + str(args.epochs) + '_' + \
+                    str(args.latent) + '_' + str(args.lr).replace('.','-')
+    else:
+        run_name = 'vsc_mnist_' + str(start_epoch) + '_' + str(args.epochs) + '_' + \
+                    str(args.latent)  +  '_' + str(args.lr).replace('.','-')
+    
+    logger = Logger('./logs' + '/' + run_name )
+
 
     print("Training VSC model...")
     for epoch in range(start_epoch , start_epoch + args.epochs + 1):
 
-        train(epoch)
-        test(epoch)
+        train_loss = train(epoch)
+        test_loss = test(epoch)
+
+        # Store log
+        logger.scalar_summary(train_loss, test_loss, epoch)
 
         # Update value of c gradually 200 ( 150 / 20K = 0.0075 )
         model.update_c(0.001) 
 
         # For each report interval store model and save images
-
         if epoch % args.report_interval == 0:
 
             with torch.no_grad():
@@ -220,15 +240,9 @@ if __name__ == "__main__":
                 sample = torch.randn(64, 200).to(device)
                 sample = model.decode(sample).cpu()
 
-                # Store sample plots
-                if args.fashion:
-                    save_image(sample.view(64, 1, 28, 28),'results/vsc_fashion_sample_' + str(epoch) + '_.png')
-                else:
-                    save_image(sample.view(64, 1, 28, 28),'results/vsc_mnist_sample_' + str(epoch) + '_.png')
+                ## Store sample plots
+                save_image(sample.view(64, 1, 28, 28),'results/sample_' + run_name + '_' + str(epoch) + '_.png')
 
                 ## Store Model
-                if args.fashion:
-                    torch.save(model.cpu().state_dict(), "models/vsc_fashion_"+str(epoch)+"_.pth")
-                else:
-                    torch.save(model.cpu().state_dict(), "models/vsc_mnist_"+str(epoch)+"_.pth")
+                torch.save(model.cpu().state_dict(), "models/" + run_name + '_' + str(epoch) + "_.pth")
             
