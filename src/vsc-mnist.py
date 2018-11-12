@@ -18,8 +18,8 @@ parser.add_argument('--latent', type=int, default=200, metavar='L',
                     help='number of latent dimensions (default: 200)')
 parser.add_argument('--lr', default=1e-3, type=float, metavar='LR', 
                     help='initial learning rate')
-parser.add_argument('--alpha', default=0.01, type=float, metavar='A', 
-                    help='value of spike variable (default: 1.0')
+parser.add_argument('--alpha', default=0.5, type=float, metavar='A', 
+                    help='value of spike variable (default: 0.5')
 parser.add_argument('--epochs', type=int, default=500, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -94,7 +94,7 @@ class VSC(nn.Module):
         eps = torch.randn_like(std)
         gaussian = eps.mul(std).add_(mu)
         eta = torch.rand_like(std)
-        selection = F.sigmoid(self.c*(eta + logspike - 1))
+        selection = F.sigmoid(self.c*(eta + logspike.exp() - 1))
         return selection.mul(gaussian)
 
     def decode(self, z):
@@ -126,12 +126,11 @@ def loss_function(recon_x, x, mu, logvar, logspike):
     BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average = False)
 
     # see Appendix B from VSC paper / Formula 6
-    spyke = torch.clamp( logspike.exp() , 1e-6 , 1.0 - 1e-6 ) 
-    #print(spyke)
-    PRIOR = -0.5 * torch.sum( spyke.mul(1 + logvar - mu.pow(2) - logvar.exp())) + \
-            torch.sum( (1-spyke).mul(torch.log((1-spyke)/(1 - args.alpha))) + \
-                        spyke.mul(torch.log(spyke/args.alpha) ) )
+    spike = torch.clamp( logspike.exp() , 1e-6 , 1.0 - 1e-6 ) 
 
+    PRIOR = -0.5 * torch.sum( spike.mul(1 + logvar - mu.pow(2) - logvar.exp()))  + \
+            torch.sum( (1-spike).mul(torch.log((1-spike)/(1 - args.alpha))) + \
+                        spike.mul(torch.log(spike/args.alpha) ) )
     return BCE + PRIOR
 
 # Run training iterations and report results
@@ -184,10 +183,12 @@ def load_last_model():
         if f.split('_')[0][-3:] == 'vsc':
             if args.fashion:
                 if f.split('_')[1] == 'fashion':
-                    model_ids.append( (int(f.split('_')[-2]), f) ) 
+                    if args.latent == int(f.split('_')[-5]) and args.alpha == float(f.split('_')[-3]):
+                        model_ids.append( (int(f.split('_')[-2]), f) ) 
             else:
                 if f.split('_')[1] == 'mnist':
-                    model_ids.append( (int(f.split('_')[-2]), f) )
+                    if args.latent == int(f.split('_')[-5]) and args.alpha == float(f.split('_')[-3]):
+                        model_ids.append( (int(f.split('_')[-2]), f) )
 
     # If no checkpoint available
     if len(model_ids) == 0 :
@@ -211,13 +212,14 @@ if __name__ == "__main__":
     #> model_dataset_startepoch_numepochs_latent_lr
     if args.fashion:
         run_name = 'vsc_fashion_' + str(start_epoch) + '_' + str(args.epochs) + '_' + \
-                    str(args.latent) + '_' + str(args.lr).replace('.','-')
+                    str(args.latent) + '_' + str(args.lr).replace('.','-') + '_' + \
+                    str(args.alpha)
     else:
         run_name = 'vsc_mnist_' + str(start_epoch) + '_' + str(args.epochs) + '_' + \
-                    str(args.latent)  +  '_' + str(args.lr).replace('.','-')
+                    str(args.latent)  +  '_' + str(args.lr).replace('.','-') + '_' + \
+                    str(args.alpha)
     
     logger = Logger('./logs' + '/' + run_name )
-
 
     print("Training VSC model...")
     for epoch in range(start_epoch , start_epoch + args.epochs + 1):
@@ -237,7 +239,7 @@ if __name__ == "__main__":
             with torch.no_grad():
 
                 ##  Generate samples
-                sample = torch.randn(64, 200).to(device)
+                sample = torch.randn(64, args.latent).to(device)
                 sample = model.decode(sample).cpu()
 
                 ## Store sample plots

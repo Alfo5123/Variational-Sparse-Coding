@@ -1,7 +1,7 @@
 from __future__ import print_function
-import argparse
-import torch
 import os
+import torch
+import argparse
 from glob import glob
 import torch.utils.data
 from torch import nn, optim
@@ -170,10 +170,12 @@ def load_last_model():
         if f.split('_')[0][-3:] == 'vae':
             if args.fashion:
                 if f.split('_')[1] == 'fashion':
-                    model_ids.append( (int(f.split('_')[-2]), f) ) 
+                    if args.latent == int(f.split('_')[-4]):
+                        model_ids.append( (int(f.split('_')[-2]), f) ) 
             else:
                 if f.split('_')[1] == 'mnist':
-                    model_ids.append( (int(f.split('_')[-2]), f) )
+                    if args.latent == int(f.split('_')[-4]):
+                        model_ids.append( (int(f.split('_')[-2]), f) )
 
     # If no checkpoint available
     if len(model_ids) == 0 :
@@ -191,6 +193,7 @@ def load_last_model():
 if __name__ == "__main__":
 
     #Load model weights from latest checkpoint
+    #start_epoch = 1
     start_epoch = load_last_model()
 
     # Store log characteristic name for each run
@@ -219,7 +222,7 @@ if __name__ == "__main__":
             with torch.no_grad():
 
                 ## Generate random samples
-                sample = torch.randn(64, 200).to(device)
+                sample = torch.randn(64, args.latent).to(device)
                 sample = model.decode(sample).cpu()
 
                 ## Store sample plots
