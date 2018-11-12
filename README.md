@@ -10,6 +10,7 @@ We aim to replicate the experiments described in the paper ["Variational Sparse 
 - [Usage](#usage)
 - [Observations](#observations)
 - [References](#references)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Description 
@@ -91,6 +92,9 @@ Papers:
 - [Auto-Encoding Variational Bayes](https://arxiv.org/pdf/1312.6114.pdf)
 - [Large-Scale Feature Learning With Spike-and-Slab Sparse Coding](https://arxiv.org/pdf/1206.6407.pdf)
 
+## Acknowledgements 
+
+Special thanks to [Emilien Dupont](https://github.com/EmilienDupont) for clarifying distinct aspects on variational autoencoders' implementation. 
 
 ## License
 [MIT License](https://github.com/Alfo5123/Variational-Sparse-Coding/blob/master/LICENSE)
