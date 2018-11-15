@@ -12,25 +12,25 @@ from logger import Logger
 
 
 parser = argparse.ArgumentParser(description='VSC MNIST Example')
-parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
+parser.add_argument('--batch-size', type=int, default=32, metavar='N',
+                    help='input batch size for training (default: 32)')
 parser.add_argument('--latent', type=int, default=200, metavar='L',
                     help='number of latent dimensions (default: 200)')
 parser.add_argument('--lr', default=1e-3, type=float, metavar='LR', 
                     help='initial learning rate')
 parser.add_argument('--alpha', default=0.5, type=float, metavar='A', 
                     help='value of spike variable (default: 0.5')
-parser.add_argument('--epochs', type=int, default=500, metavar='N',
-                    help='number of epochs to train (default: 10)')
+parser.add_argument('--epochs', type=int, default=11, metavar='N',
+                    help='number of epochs to train (default: 11)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('--fashion', action='store_true', default=False,
                     help='use fashion-mnist instead of mnist')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+parser.add_argument('--log-interval', type=int, default=500, metavar='N',
                     help='how many batches to wait before logging training status')
-parser.add_argument('--report-interval', type=int, default=50, metavar='N',
+parser.add_argument('--report-interval', type=int, default=11, metavar='N',
                     help='how many epochs to wait before storing training status')
 
 args = parser.parse_args()
@@ -49,8 +49,8 @@ if args.fashion :
     print("Loading Fashion-MNIST dataset...")
     train_loader = torch.utils.data.DataLoader(
         datasets.FashionMNIST('../data/fashion-mnist', train=True, download=False,
-                       transform=transforms.ToTensor()),
-        batch_size=args.batch_size, shuffle=True, **kwargs)
+        transform=transforms.ToTensor()), batch_size=args.batch_size, shuffle=True, **kwargs)
+
     test_loader = torch.utils.data.DataLoader(
         datasets.FashionMNIST('../data/fashion-mnist', train=False, transform=transforms.ToTensor()),
         batch_size=args.batch_size, shuffle=True, **kwargs)
@@ -61,8 +61,8 @@ else:
     print("Loading MNIST dataset...")
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data/mnist', train=True, download=False,
-                       transform=transforms.ToTensor()),
-        batch_size=args.batch_size, shuffle=True, **kwargs)
+        transform=transforms.ToTensor()), batch_size=args.batch_size, shuffle=True, **kwargs)
+
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data/mnist', train=False, transform=transforms.ToTensor()),
         batch_size=args.batch_size, shuffle=True, **kwargs)
@@ -130,7 +130,8 @@ def loss_function(recon_x, x, mu, logvar, logspike):
 
     PRIOR = -0.5 * torch.sum( spike.mul(1 + logvar - mu.pow(2) - logvar.exp()))  + \
             torch.sum( (1-spike).mul(torch.log((1-spike)/(1 - args.alpha))) + \
-                        spike.mul(torch.log(spike/args.alpha) ) )
+            spike.mul(torch.log(spike/args.alpha) ) )
+
     return BCE + PRIOR
 
 # Run training iterations and report results
@@ -166,8 +167,8 @@ def test(epoch):
             recon_batch, mu, logvar, logspike = model(data)
             test_loss += loss_function(recon_batch, data, mu, logvar, logspike).item()
 
-    VLB = test_loss 
-    test_loss /= len(test_loader.dataset)
+    VLB = test_loss / ( i +  1) # Average loss per batch
+    test_loss /= len(test_loader.dataset) # Loss per number of observations
     print('====> Test set loss: {:.4f} - VLB-VSC : {:.4f} '.format(test_loss, VLB))
 
     return test_loss
@@ -206,8 +207,8 @@ def load_last_model():
 if __name__ == "__main__":
 
     #Load model weights from latest checkpoint
-    start_epoch = load_last_model()
-
+    #start_epoch = load_last_model()
+    start_epoch = 1
     # Store log characteristic name for each run
     #> model_dataset_startepoch_numepochs_latent_lr
     if args.fashion:
@@ -222,7 +223,7 @@ if __name__ == "__main__":
     logger = Logger('./logs' + '/' + run_name )
 
     print("Training VSC model...")
-    for epoch in range(start_epoch , start_epoch + args.epochs + 1):
+    for epoch in range(start_epoch , start_epoch + args.epochs ):
 
         train_loss = train(epoch)
         test_loss = test(epoch)
