@@ -24,6 +24,16 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 ## Results
 
+**Playing with low-dimensional latent space variables**
+
+<div align="center">
+ <img src="src/results/latent8alpha001.gif" height="400px">
+</div>
+
+**Reconstruction results by modying encoding in 200-dimensional latent space**
+
+![](src/results/latent200_alpha001_ex1.png) 
+
 ## Usage
 
 ### Set up
@@ -55,7 +65,7 @@ It will download and store the datasets locally in the **data** folder.
 
 ### Pretrained Models
 
-Aiming to simplify the reproducibility research process, we store the checkpoints of the trained models in **models** within the **src** folder. In addition, we include a folder **results** to collect visualizations for different checkpoints.
+Aiming to simplify the reproducibility research process, we store the checkpoints of the trained models in the following [link](https://drive.google.com/open?id=1rW02-rpQxAk9yLco8OTMFzFI28o-qOQI). In order to run the scripts & notebooks using pretrained models, you must download the checkpoints and put them in **models** within the **src** folder.
 
 ### Train Models 
 
@@ -79,6 +89,7 @@ To visualize training results in TensorBoard, we can use the following command f
 ```
 $ tensorboard --logdir='./logs' --port=6006
 ```
+
 
 ## Observations
 - [ ] Typo ? Difference between formula 6 and 9 / 21 signs
