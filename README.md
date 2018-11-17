@@ -27,12 +27,12 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 **Playing with low-dimensional latent space variables**
 
 <div align="center">
- <img src="src/results/latent8alpha001.gif" height="400px">
+ <img src="results/images/latent8alpha001.gif" height="400px">
 </div>
 
 **Reconstruction results by modying encoding in 200-dimensional latent space**
 
-![](src/results/latent200_alpha001_ex1.png) 
+![](results/images/latent200_alpha001_ex1.png) 
 
 ## Usage
 
