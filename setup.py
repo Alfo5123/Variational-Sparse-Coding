@@ -114,9 +114,10 @@ if __name__ == '__main__':
     
     # Create project folder organization
     os.makedirs('notebooks', exist_ok=True)
-    os.makedirs('src', exist_ok=True)
+    os.makedirs('results/logs', exist_ok=True)
+    os.makedirs('results/images', exist_ok=True)
+    os.makedirs('results/checkpoints', exist_ok=True)
     os.makedirs('src/models', exist_ok=True)
-    os.makedirs('src/results', exist_ok=True)
 
     # Read datasets to download
     parser = argparse.ArgumentParser(description='Download datasets for VSC experiments')
