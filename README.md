@@ -77,11 +77,11 @@ $ python [model] [args]
 For example
 
 ```
-$ python vae_mnist.py --epochs 500 --report-interval 50 --lr 0.01 
+$ python vae-mnist.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.01 
 ```
 
 ```
-$ python vsc_mnist.py --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01 --fashion
+$ python vsc-mnist.py --dataset fashion --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01
 ```
 
 To visualize training results in TensorBoard, we can use the following command from a new terminal within **src** folder. 
