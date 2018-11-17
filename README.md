@@ -38,7 +38,7 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 ### Set up
 
->Requires Python 3.0 or higher.
+>Requires Python 3.6 or higher.
 
 The following lines will clone the repository and install all the required dependencies.
 
