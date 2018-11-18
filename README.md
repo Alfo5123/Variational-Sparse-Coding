@@ -32,7 +32,14 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 **Reconstruction results by modying encoding in 200-dimensional latent space**
 
-![](results/images/latent200_alpha001_ex1.png) 
+
+<div align="center">
+ <img src="results/images/latent200_alpha001_ex1.png" height="500px">
+</div>
+
+<div align="center">
+ <img src="results/images/latent200_alpha001.ex4.png" height="500px">
+</div>
 
 ## Usage
 
