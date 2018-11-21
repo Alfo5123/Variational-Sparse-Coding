@@ -34,7 +34,7 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 
 <div align="center">
- <img src="results/images/latent200_alpha001_ex1.png" height="500px">
+ <img src="results/images/latent200_alpha001.ex2.png" height="500px">
 </div>
 
 <div align="center">
