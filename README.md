@@ -24,6 +24,13 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 ## Results
 
+**Latent Space Traversal Generation (200 dimensions - ![equation](http://latex.codecogs.com/gif.latex?\alpha)  = 0.01)**
+
+MNIST               |  Fashion-MNIST               | 
+:-------------------------:|:-------------------------:
+![](results/images/Fashion-traversal.png)  |  ![](results/images/Mnist-traversal.png) 
+
+
 **Playing with low-dimensional latent space variables**
 
 <div align="center">
