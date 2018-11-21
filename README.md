@@ -41,6 +41,12 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
  <img src="results/images/latent200_alpha001.ex4.png" height="500px">
 </div>
 
+**Varying latent space dimensionality**
+
+MNIST               |  Fashion-MNIST               | 
+:-------------------------:|:-------------------------:
+![](results/images/latent_mnist_example.png)  |  ![](results/images/latent_fashion_example.png) 
+
 ## Usage
 
 ### Set up
@@ -109,6 +115,10 @@ Papers:
 - **[Variational Sparse Coding](https://openreview.net/pdf?id=SkeJ6iR9Km)**
 - [Auto-Encoding Variational Bayes](https://arxiv.org/pdf/1312.6114.pdf)
 - [Large-Scale Feature Learning With Spike-and-Slab Sparse Coding](https://arxiv.org/pdf/1206.6407.pdf)
+- [Stick-Breaking Variational Autoencoders](https://arxiv.org/pdf/1605.06197.pdf)
+- [beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework](https://openreview.net/pdf?id=Sy2fzU9gl)
+- [Disentangling by Factorising](https://arxiv.org/pdf/1802.05983.pdf)
+- [Neural Discrete Representation Learning](https://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf)
 
 ## Acknowledgements 
 
