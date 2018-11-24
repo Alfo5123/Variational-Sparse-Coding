@@ -112,9 +112,12 @@ $ tensorboard --logdir='./logs' --port=6006
 
 
 ## Observations
-- [ ] Typo ? Difference between formula 6 and 9 / 21 signs
+- [ ] Difference between formula 6 and 9 / 21 signs (possibly typo?)
 - [ ] How gradually show we increase c? Linearly for 20k iterations?
-- [ ] Equation 10 : Recognition function,  numerical inestability -ReLU( -Vout ) = 0 -> spike = 1 
+- [ ] Recognition function suffers from  numerical inestability, since for spike = 1, then  -ReLU( -Vout ) = 0
+- [ ] Increase the number of iterations suggested for the paper and re-run VLB experiment 
+- [ ] Use convolutional architectures for encoder and decoder to see improvements on generated samples quality.
+- [ ] Apply model to [Disentanglement testing Sprites dataset](https://github.com/deepmind/dsprites-dataset), to measure the effect of sparcity in disentanglement metric. 
 
 ## References
 
@@ -129,7 +132,7 @@ Papers:
 
 ## Acknowledgements 
 
-Special thanks to [Emilien Dupont](https://github.com/EmilienDupont) for clarifying distinct aspects on variational autoencoders' implementation. 
+Special thanks to [Emilien Dupont](https://github.com/EmilienDupont) for clarifying distinct aspects on variational autoencoders' implementation, and [Lukas Mosser](https://github.com/LukasMosser) for his suggestions on training generative models.
 
 ## License
 [MIT License](https://github.com/Alfo5123/Variational-Sparse-Coding/blob/master/LICENSE)
