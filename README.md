@@ -129,6 +129,7 @@ Papers:
 - [beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework](https://openreview.net/pdf?id=Sy2fzU9gl)
 - [Disentangling by Factorising](https://arxiv.org/pdf/1802.05983.pdf)
 - [Neural Discrete Representation Learning](https://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf)
+- [Tutorial on Variational Autoencoders](https://arxiv.org/pdf/1606.05908.pdf)
 
 ## Acknowledgements 
 
