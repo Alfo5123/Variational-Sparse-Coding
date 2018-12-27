@@ -54,6 +54,16 @@ MNIST               |  Fashion-MNIST               |
 :-------------------------:|:-------------------------:
 ![](results/images/latent_mnist_example.png)  |  ![](results/images/latent_fashion_example.png) 
 
+
+**Conditional Sampling**
+<div align="center">
+ <img src="results/images/mnist_condition.png" height="100px">
+</div>
+
+<div align="center">
+ <img src="results/images/mnist_fashion_conditional" height="100px">
+</div>
+
 ## Usage
 
 ### Set up
