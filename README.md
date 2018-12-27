@@ -28,7 +28,7 @@ We replicate the results of the recent paper *Variational Sparse Coding* and ext
 
 MNIST               |  Fashion-MNIST               | 
 :-------------------------:|:-------------------------:
-![](results/images/Fashion-traversal.png)  |  ![](results/images/Mnist-traversal.png) 
+![](results/images/Mnist-traversal.png)  |  ![](results/images/Fashion-traversal.png) 
 
 
 **Playing with low-dimensional latent space variables**
