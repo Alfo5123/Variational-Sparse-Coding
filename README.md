@@ -41,11 +41,11 @@ MNIST               |  Fashion-MNIST               |
 
 
 <div align="center">
- <img src="results/images/latent200_alpha001.ex2.png" height="500px">
+ <img src="results/images/latent200_alpha001.ex2.png" height="400px">
 </div>
 
 <div align="center">
- <img src="results/images/latent200_alpha001.ex4.png" height="500px">
+ <img src="results/images/latent200_alpha001.ex4.png" height="400px">
 </div>
 
 **Varying latent space dimensionality**
@@ -57,11 +57,11 @@ MNIST               |  Fashion-MNIST               |
 
 **Conditional Sampling**
 <div align="center">
- <img src="results/images/mnist_condition.png" height="100px">
+ <img src="results/images/mnist_conditional.png" height="100px">
 </div>
 
 <div align="center">
- <img src="results/images/mnist_fashion_conditional" height="100px">
+ <img src="results/images/mnist_fashion_conditional.png" height="100px">
 </div>
 
 ## Usage
