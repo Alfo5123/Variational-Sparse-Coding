@@ -1,14 +1,17 @@
 import argparse
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+from datasets import CelebA
 
 
 def get_argparser(description):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
                         help='input batch size for training (default: 32)')
+    # Hidden size for CelebA: 2000 dimensions, 2 layers
     parser.add_argument('--hidden-size', type=int, default=400, metavar='HS',
                         help='hidden size (default: 400)')
+    # Latent size for CelebA: 800 dimensions
     parser.add_argument('--latent-size', type=int, default=200, metavar='LS',
                         help='number of latent dimensions (default: 200)')
     parser.add_argument('--lr', default=1e-3, type=float, metavar='LR', 
@@ -37,10 +40,16 @@ def get_datasets(dataset, batch_size, cuda):
         Dataset = datasets.FashionMNIST
         dataset_path = '../data/fashion-mnist'
         width, height = 28, 28
-    else:
+    elif dataset == 'mnist':
         Dataset = datasets.MNIST
         dataset_path = '../data/mnist'
         width, height = 28, 28
+    elif dataset == 'celeba':
+        Dataset = CelebA
+        dataset_path = '../data/celeba'
+        width, height = 32, 32
+    else:
+        raise ValueError('Dataset not supported')
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
         
