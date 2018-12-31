@@ -9,8 +9,8 @@ def get_argparser(description):
     parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
                         help='input batch size for training (default: 32)')
     # Hidden size for CelebA: 2000 dimensions, 2 layers
-    parser.add_argument('--hidden-size', type=int, default=400, metavar='HS',
-                        help='hidden size (default: 400)')
+    parser.add_argument('--hidden-size', type=str, default='400', metavar='HS',
+                        help='hidden sizes, separated by commas (default: 400)')
     # Latent size for CelebA: 800 dimensions
     parser.add_argument('--latent-size', type=int, default=200, metavar='LS',
                         help='number of latent dimensions (default: 200)')

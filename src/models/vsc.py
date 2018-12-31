@@ -7,23 +7,29 @@ from .base_model import VariationalBaseModel
 
 # Variational Sparse Coding Model 
 class VSC(nn.Module):
-    def __init__(self, input_sz, hidden_sz, latent_sz):
+    def __init__(self, input_sz, hidden_szs, latent_sz):
         super(VSC, self).__init__()
         self.input_sz = input_sz # 784
-        self.hidden_sz = hidden_sz # 400
+        self.hidden_szs = hidden_szs # [400]
         self.latent_sz = latent_sz
         self.c = 50.0
         
-        self.fc1 = nn.Linear(input_sz, hidden_sz)
-        self.fc21 = nn.Linear(hidden_sz, latent_sz)
-        self.fc22 = nn.Linear(hidden_sz, latent_sz)
-        self.fc23 = nn.Linear(hidden_sz, latent_sz)
-        self.fc3 = nn.Linear(latent_sz, hidden_sz)
-        self.fc4 = nn.Linear(hidden_sz, input_sz)
+        self.fc1 = nn.Linear(input_sz, hidden_szs[0])
+        self.fc1n = [nn.Linear(hidden_szs[i], hidden_szs[i+1]) \
+                    for i in range(len(hidden_szs) - 1)]
+        self.fc21 = nn.Linear(hidden_szs[-1], latent_sz)
+        self.fc22 = nn.Linear(hidden_szs[-1], latent_sz)
+        self.fc23 = nn.Linear(hidden_szs[-1], latent_sz)
+        self.fc3 = nn.Linear(latent_sz, hidden_szs[-1])
+        self.fc3n = [nn.Linear(hidden_szs[-i-1], hidden_szs[-i-2]) \
+                    for i in range(len(hidden_szs) - 1)]
+        self.fc4 = nn.Linear(hidden_szs[0], input_sz)
 
     def encode(self, x):
         #Recognition function
         h1 = F.relu(self.fc1(x))
+        for fc in self.fc1n:
+            h1 = F.relu(fc(h1))
         return self.fc21(h1), self.fc22(h1), -F.relu(-self.fc23(h1))
 
     def reparameterize(self, mu, logvar, logspike ):
@@ -37,6 +43,8 @@ class VSC(nn.Module):
     def decode(self, z):
         #Likelihood function
         h3 = F.relu(self.fc3(z))
+        for fc in self.fc3n:
+            h3 = F.relu(fc(h3))
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
@@ -57,7 +65,7 @@ class VariationalSparseCoding(VariationalBaseModel):
                          learning_rate, device, log_interval)
         
         self.alpha = alpha
-        self.model = VSC(self.input_sz, hidden_sz, latent_sz).to(device)
+        self.model = VSC(self.input_sz, self.hidden_sz, latent_sz).to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
     
     

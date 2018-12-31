@@ -107,11 +107,11 @@ $ python [model] [args]
 For example
 
 ```
-$ python vae-training.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.01 
+$ python train-var.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.01 
 ```
 
 ```
-$ python vsc-training.py --dataset fashion --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01
+$ python train-vsc.py --dataset celeba --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01 --hidden-size 2000,2000
 ```
 
 To visualize training results in TensorBoard, we can use the following command from a new terminal within **src** folder. 

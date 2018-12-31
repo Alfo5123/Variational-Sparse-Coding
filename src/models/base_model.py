@@ -12,7 +12,7 @@ class VariationalBaseModel():
         self.width = width
         self.height = height
         self.input_sz = width * height * channels
-        self.hidden_sz = hidden_sz
+        self.hidden_sz = [int(hs) for hs in hidden_sz.split(',')]
         self.latent_sz = latent_sz
         
         self.lr = learning_rate
