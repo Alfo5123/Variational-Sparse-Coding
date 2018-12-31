@@ -107,7 +107,7 @@ $ python [model] [args]
 For example
 
 ```
-$ python train-var.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.01 
+$ python train-vae.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.01 
 ```
 
 ```
