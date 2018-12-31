@@ -18,14 +18,14 @@ if __name__ == "__main__":
     print(f'Using {device} device...')
     
     #Load datasets
-    train_loader, test_loader, (width, height) = get_datasets(args.dataset, 
-                                                              args.batch_size,
-                                                              args.cuda)
+    train_loader, test_loader, (width, height, channels) = get_datasets(args.dataset, 
+                                                                        args.batch_size,
+                                                                        args.cuda)
     
     # Tune the learning rate (All training rates used were between 0.001 and 0.01)
-    vae = VariationalAutoEncoder(args.dataset, width, height, args.hidden_size, 
-                                 args.latent_size, args.lr, device, 
-                                 args.log_interval)
+    vae = VariationalAutoEncoder(args.dataset, width, height, channels, 
+                                 args.hidden_size, args.latent_size, args.lr, 
+                                 device, args.log_interval)
     vae.run_training(train_loader, test_loader, args.epochs,
                      args.report_interval, args.sample_size)
     

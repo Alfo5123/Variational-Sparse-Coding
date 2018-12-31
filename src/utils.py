@@ -39,15 +39,15 @@ def get_datasets(dataset, batch_size, cuda):
     if dataset == 'fashion':
         Dataset = datasets.FashionMNIST
         dataset_path = '../data/fashion-mnist'
-        width, height = 28, 28
+        width, height, channels = 28, 28, 1
     elif dataset == 'mnist':
         Dataset = datasets.MNIST
         dataset_path = '../data/mnist'
-        width, height = 28, 28
+        width, height, channels = 28, 28, 1
     elif dataset == 'celeba':
         Dataset = CelebA
         dataset_path = '../data/celeba'
-        width, height = 32, 32
+        width, height, channels = 32, 32, 3
     else:
         raise ValueError('Dataset not supported')
 
@@ -61,4 +61,4 @@ def get_datasets(dataset, batch_size, cuda):
                                      transform=transforms.ToTensor()),
                              batch_size=batch_size, shuffle=True, **kwargs)
     print('Done!\n')
-    return train_loader, test_loader, (width, height)
+    return train_loader, test_loader, (width, height, channels)

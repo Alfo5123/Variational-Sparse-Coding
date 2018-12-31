@@ -40,7 +40,7 @@ class VSC(nn.Module):
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
-        mu, logvar, logspike = self.encode(x.view(-1, self.input_sz))
+        mu, logvar, logspike = self.encode(x)
         z = self.reparameterize(mu, logvar, logspike)
         return self.decode(z), mu, logvar, logspike
     
@@ -51,9 +51,9 @@ class VSC(nn.Module):
 
     
 class VariationalSparseCoding(VariationalBaseModel):
-    def __init__(self, dataset, width, height, hidden_sz, latent_sz, 
+    def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
                  learning_rate, alpha, device, log_interval):
-        super().__init__(dataset, width, height, hidden_sz, latent_sz,
+        super().__init__(dataset, width, height, channels, hidden_sz, latent_sz,
                          learning_rate, device, log_interval)
         
         self.alpha = alpha

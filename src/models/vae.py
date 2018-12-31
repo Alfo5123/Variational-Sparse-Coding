@@ -34,15 +34,15 @@ class VAE(nn.Module):
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, self.input_sz))
+        mu, logvar = self.encode(x)
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
     
 class VariationalAutoEncoder(VariationalBaseModel):
-    def __init__(self, dataset, width, height, hidden_sz, latent_sz, 
+    def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
                  learning_rate, device, log_interval):
-        super().__init__(dataset, width, height, hidden_sz, latent_sz,
+        super().__init__(dataset, width, height, channels, hidden_sz, latent_sz,
                          learning_rate, device, log_interval)
         
         self.model = VAE(self.input_sz, hidden_sz, latent_sz).to(device)

@@ -6,12 +6,12 @@ from logger import Logger
 
 
 class VariationalBaseModel():
-    def __init__(self, dataset, width, height, hidden_sz, latent_sz, 
+    def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
                  learning_rate, device, log_interval):
         self.dataset = dataset
         self.width = width
         self.height = height
-        self.input_sz = width * height
+        self.input_sz = width * height * channels
         self.hidden_sz = hidden_sz
         self.latent_sz = latent_sz
         
@@ -38,13 +38,21 @@ class VariationalBaseModel():
             self.optimizer.step()
         return loss.item()
     
+
+    # TODO: Perform transformations inside DataLoader (extend datasets.MNIST)
+    def normalize_input(self, batch):
+        batch_size = len(batch)
+        flattened_batch = batch.view(batch_size, -1)
+        batch_norm = flattened_batch.norm(dim=1, p=2)
+        return flattened_batch / batch_norm[:, None]
+
     
     # Run training iterations and report results
     def train(self, train_loader, epoch):
         self.model.train()
         train_loss = 0
         for batch_idx, (data, _) in enumerate(train_loader):
-            data = data.to(self.device)      
+            data = self.normalize_input(data).to(self.device)
             loss = self.step(data, train=True)
             train_loss += loss
             if batch_idx % self.log_interval == 0:
@@ -64,7 +72,7 @@ class VariationalBaseModel():
         test_loss = 0
         with torch.no_grad():
             for data, _ in test_loader:
-                data = data.to(self.device)
+                data = self.normalize_input(data).to(self.device)
                 test_loss += self.step(data, train=False)
                 
         VLB = test_loss / len(test_loader)
