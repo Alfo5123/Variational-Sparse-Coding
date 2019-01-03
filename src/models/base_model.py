@@ -11,6 +11,7 @@ class VariationalBaseModel():
         self.dataset = dataset
         self.width = width
         self.height = height
+        self.channels = channels
         self.input_sz = width * height * channels
         self.hidden_sz = [int(hs) for hs in hidden_sz.split(',')]
         self.latent_sz = latent_sz
@@ -43,8 +44,8 @@ class VariationalBaseModel():
     def normalize_input(self, batch):
         batch_size = len(batch)
         flattened_batch = batch.view(batch_size, -1)
-        batch_norm = flattened_batch.norm(dim=1, p=2)
-        return flattened_batch / batch_norm[:, None]
+#         batch_norm = flattened_batch.norm(dim=1, p=2)
+        return flattened_batch # / batch_norm[:, None]
 
     
     # Run training iterations and report results
@@ -142,7 +143,7 @@ class VariationalBaseModel():
                                   .to(self.device)
                     sample = self.model.decode(sample).cpu()
                     ## Store sample plots
-                    save_image(sample.view(sample_sz, 1, self.width,
+                    save_image(sample.view(sample_sz, self.channels, self.width,
                                            self.height),
                                f'{images_path}/sample_{run_name}_{epoch}.png')
                     ## Store Model

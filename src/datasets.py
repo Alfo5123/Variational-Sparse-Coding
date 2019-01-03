@@ -14,6 +14,11 @@ class CelebA(Dataset):
         self.train_size = train_size
         self.test_size = test_size
         self.transform = transform
+        
+        print(self.image_files[:5])
+        print(self.image_files[-5:])
+        print()
+        
         np.random.seed(random_state)
         np.random.shuffle(self.image_files)
 
@@ -21,6 +26,10 @@ class CelebA(Dataset):
             self.image_files = self.image_files[:train_size]
         else:
             self.image_files = self.image_files[-test_size:]
+            
+        print(self.image_files[:5])
+        print(self.image_files[-5:])
+        print()
 
     def __len__(self):
         return len(self.image_files)

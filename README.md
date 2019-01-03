@@ -111,7 +111,7 @@ $ python train-vae.py --dataset mnist --epochs 500 --report-interval 50 --lr 0.0
 ```
 
 ```
-$ python train-vsc.py --dataset celeba --epochs 1000 --report-interval 100 --lr 0.001 --alpha 0.01 --hidden-size 2000,2000
+$ python train-vsc.py --dataset celeba --epochs 20 --report-interval 4 --lr 0.001 --alpha 0.2 --hidden-size 2000,2000 --latent-size 800
 ```
 
 To visualize training results in TensorBoard, we can use the following command from a new terminal within **src** folder. 
