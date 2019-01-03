@@ -13,13 +13,15 @@ class VAE(nn.Module):
         self.latent_sz = latent_sz
         
         self.fc1 = nn.Linear(input_sz, hidden_szs[0])
-        self.fc1n = [nn.Linear(hidden_szs[i], hidden_szs[i+1]) \
-                    for i in range(len(hidden_szs) - 1)]
+        self.fc1n = nn.ModuleList(
+            [nn.Linear(hidden_szs[i], hidden_szs[i+1]) \
+             for i in range(len(hidden_szs) - 1)])
         self.fc21 = nn.Linear(hidden_szs[-1], latent_sz)
         self.fc22 = nn.Linear(hidden_szs[-1], latent_sz)
         self.fc3 = nn.Linear(latent_sz, hidden_szs[-1])
-        self.fc3n = [nn.Linear(hidden_szs[-i-1], hidden_szs[-i-2]) \
-                    for i in range(len(hidden_szs) - 1)]
+        self.fc3n = nn.ModuleList(
+            [nn.Linear(hidden_szs[-i-1], hidden_szs[-i-2]) \
+             for i in range(len(hidden_szs) - 1)])
         self.fc4 = nn.Linear(hidden_szs[0], input_sz)
 
     def encode(self, x):

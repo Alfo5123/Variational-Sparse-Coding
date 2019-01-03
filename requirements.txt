@@ -5,4 +5,5 @@ tqdm==4.19.5
 numpy==1.15.3
 torch==0.4.0
 tensorflow==1.6.0
+scikit-image==0.14.1
 six==1.11.0
