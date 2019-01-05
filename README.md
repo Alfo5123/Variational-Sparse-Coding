@@ -37,7 +37,7 @@ MNIST               |  Fashion-MNIST               |
  <img src="results/images/latent8alpha001.gif" height="400px">
 </div>
 
-**Reconstruction results by modying encoding in 200-dimensional latent space**
+**Reconstruction results by modifying encoding in 200-dimensional latent space**
 
 
 <div align="center">
