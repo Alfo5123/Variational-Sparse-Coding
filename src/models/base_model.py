@@ -3,7 +3,8 @@ from torchvision.utils import save_image
 from pathlib import Path
 from glob import glob
 from logger import Logger
-
+import pandas as pd
+from tqdm import tqdm
 
 class VariationalBaseModel():
     def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
@@ -41,11 +42,16 @@ class VariationalBaseModel():
     
 
     # TODO: Perform transformations inside DataLoader (extend datasets.MNIST)
-    def normalize_input(self, batch):
+    def normalize(self, batch):
         batch_size = len(batch)
         flattened_batch = batch.view(batch_size, -1)
 #         batch_norm = flattened_batch.norm(dim=1, p=2)
-        return flattened_batch # / batch_norm[:, None]
+#         flattened_batch /= batch_norm[:, None]
+        return flattened_batch / self.scaling_factor
+
+    
+    def denormalize(self, batch):
+        return batch * self.scaling_factor
 
     
     # Run training iterations and report results
@@ -53,7 +59,7 @@ class VariationalBaseModel():
         self.model.train()
         train_loss = 0
         for batch_idx, (data, _) in enumerate(train_loader):
-            data = self.normalize_input(data).to(self.device)
+            data = self.normalize(data).to(self.device)
             loss = self.step(data, train=True)
             train_loss += loss
             if batch_idx % self.log_interval == 0:
@@ -73,7 +79,7 @@ class VariationalBaseModel():
         test_loss = 0
         with torch.no_grad():
             for data, _ in test_loader:
-                data = self.normalize_input(data).to(self.device)
+                data = self.normalize(data).to(self.device)
                 test_loss += self.step(data, train=False)
                 
         VLB = test_loss / len(test_loader)
@@ -116,11 +122,30 @@ class VariationalBaseModel():
         pass
     
     
+    def calculate_scaling_factor(self, data_loader):
+        print(f'Calculating norm mean of training set')
+        norms = []
+        self.model.eval()
+        n_batches = len(data_loader)
+        for batch_idx, (data, _) in tqdm(enumerate(data_loader), total=n_batches):
+            batch_size = len(data)
+            flattened_batch = data.view(batch_size, -1)
+            batch_norm = flattened_batch.norm(dim=1, p=2)
+            norms.extend(list(batch_norm.numpy()))
+        norms = pd.Series(norms)
+        print(norms.describe())
+        self.scaling_factor = norms.mean()
+        print('Done!\n')
+    
+    
     def run_training(self, train_loader, test_loader, epochs, 
                      report_interval, sample_sz=64,
                      checkpoints_path='../results/checkpoints',
                      logs_path='../results/logs',
                      images_path='../results/images'):
+        
+        
+        self.calculate_scaling_factor(train_loader)
         
         start_epoch = self.load_last_model(checkpoints_path)
         name = self.model.__class__.__name__
@@ -142,6 +167,7 @@ class VariationalBaseModel():
                     sample = torch.randn(sample_sz, self.latent_sz) \
                                   .to(self.device)
                     sample = self.model.decode(sample).cpu()
+                    sample = self.denormalize(sample)
                     ## Store sample plots
                     save_image(sample.view(sample_sz, self.channels, self.width,
                                            self.height),
