@@ -31,6 +31,11 @@ MNIST               |  Fashion-MNIST               |
 ![](results/images/Mnist-traversal.png)  |  ![](results/images/Fashion-traversal.png) 
 
 
+| CelebA | 
+| :-------------------------: |
+| <img src="results/images/CelebA_Traversal.png" height="400px"> |
+
+
 **Playing with low-dimensional latent space variables**
 
 <div align="center">
