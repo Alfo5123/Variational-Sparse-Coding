@@ -8,7 +8,6 @@ We aim to replicate the experiments described in the paper ["Variational Sparse 
 - [Authors](#authors)
 - [Results](#results)
 - [Usage](#usage)
-- [Observations](#observations)
 - [References](#references)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
@@ -31,9 +30,13 @@ MNIST               |  Fashion-MNIST               |
 ![](results/images/Mnist-traversal.png)  |  ![](results/images/Fashion-traversal.png) 
 
 
+<center>
+ 
 | CelebA | 
 | :-------------------------: |
 | <img src="results/images/CelebA_Traversal.png" height="400px"> |
+
+ </center>
 
 
 **Playing with low-dimensional latent space variables**
@@ -125,14 +128,6 @@ To visualize training results in TensorBoard, we can use the following command f
 $ tensorboard --logdir='./logs' --port=6006
 ```
 
-
-## Observations
-- [ ] Difference between formula 6 and 9 / 21 signs (possibly typo?)
-- [ ] How gradually show we increase c? Linearly for 20k iterations?
-- [ ] Recognition function suffers from  numerical inestability, since for spike = 1, then  -ReLU( -Vout ) = 0
-- [ ] Increase the number of iterations suggested for the paper and re-run VLB experiment 
-- [ ] Use convolutional architectures for encoder and decoder to see improvements on generated samples quality.
-- [ ] Apply model to [Disentanglement testing Sprites dataset](https://github.com/deepmind/dsprites-dataset), to measure the effect of sparcity in disentanglement metric. 
 
 ## References
 
