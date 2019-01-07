@@ -62,9 +62,9 @@ class VSC(nn.Module):
     
 class VariationalSparseCoding(VariationalBaseModel):
     def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
-                 learning_rate, alpha, device, log_interval):
+                 learning_rate, alpha, device, log_interval, normalize):
         super().__init__(dataset, width, height, channels, hidden_sz, latent_sz,
-                         learning_rate, device, log_interval)
+                         learning_rate, device, log_interval, normalize)
         
         self.alpha = alpha
         self.model = VSC(self.input_sz, self.hidden_sz, latent_sz).to(device)

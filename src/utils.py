@@ -1,7 +1,7 @@
-import argparse
+import argparse, os
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from datasets import CelebA
+from .datasets import CelebA
 
 
 def get_argparser(description):
@@ -30,23 +30,27 @@ def get_argparser(description):
                         help='how many epochs to wait before storing training status')
     parser.add_argument('--sample-size', type=int, default=64, metavar='SS',
                         help='how many images to include in sample image')
+    parser.add_argument('--do-not-resume', action='store-true', default=False,
+                        help='retrains the model from scratch')
+    parser.add_argument('--normalize', action='store-true', default=False,
+                        help='applies normalization')
     return parser
 
 
-def get_datasets(dataset, batch_size, cuda):
-    #Load datasets
+def get_datasets(dataset, batch_size, cuda, root='../data'):
+    # Load datasets 
     print(f'Loading {dataset} dataset...')
     if dataset == 'fashion':
         Dataset = datasets.FashionMNIST
-        dataset_path = '../data/fashion-mnist'
+        dataset_path = os.path.join(root, 'fashion-mnist')
         width, height, channels = 28, 28, 1
     elif dataset == 'mnist':
         Dataset = datasets.MNIST
-        dataset_path = '../data/mnist'
+        dataset_path = os.path.join(root, 'mnist')
         width, height, channels = 28, 28, 1
     elif dataset == 'celeba':
         Dataset = CelebA
-        dataset_path = '../data/celeba'
+        dataset_path = os.path.join(root, 'celeba')
         width, height, channels = 32, 32, 3
     else:
         raise ValueError('Dataset not supported')

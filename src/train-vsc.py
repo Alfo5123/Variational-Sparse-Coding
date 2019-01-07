@@ -27,7 +27,9 @@ if __name__ == "__main__":
     # Tune the learning rate (All training rates used were between 0.001 and 0.01)
     vsc = VariationalSparseCoding(args.dataset, width, height, channels, 
                                   args.hidden_size, args.latent_size, args.lr, 
-                                  args.alpha, device, args.log_interval)
+                                  args.alpha, device, args.log_interval,
+                                  args.normalize)
     vsc.run_training(train_loader, test_loader, args.epochs,
-                     args.report_interval, args.sample_size)
+                     args.report_interval, args.sample_size, 
+                     reload_model=not args.do_not_resume)
     

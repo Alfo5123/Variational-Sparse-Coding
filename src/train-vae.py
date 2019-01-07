@@ -25,7 +25,9 @@ if __name__ == "__main__":
     # Tune the learning rate (All training rates used were between 0.001 and 0.01)
     vae = VariationalAutoEncoder(args.dataset, width, height, channels, 
                                  args.hidden_size, args.latent_size, args.lr, 
-                                 device, args.log_interval)
+                                 device, args.log_interval, 
+                                 reload_model=not args.do_not_resume,
+                                 normalize=args.normalize)
     vae.run_training(train_loader, test_loader, args.epochs,
                      args.report_interval, args.sample_size)
     

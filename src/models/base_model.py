@@ -2,24 +2,26 @@ import torch
 from torchvision.utils import save_image
 from pathlib import Path
 from glob import glob
-from logger import Logger
 import pandas as pd
 from tqdm import tqdm
 
+from ..logger import Logger
+
 class VariationalBaseModel():
     def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
-                 learning_rate, device, log_interval):
+                 learning_rate, device, log_interval, normalize):
         self.dataset = dataset
         self.width = width
         self.height = height
         self.channels = channels
         self.input_sz = width * height * channels
-        self.hidden_sz = [int(hs) for hs in hidden_sz.split(',')]
+        self.hidden_sz = [int(hs) for hs in str(hidden_sz).split(',')]
         self.latent_sz = latent_sz
         
         self.lr = learning_rate
         self.device = device
         self.log_interval = log_interval
+        self.normalize_data = normalize
         
         # To be implemented by subclasses
         self.model = None
@@ -47,12 +49,30 @@ class VariationalBaseModel():
         flattened_batch = batch.view(batch_size, -1)
 #         batch_norm = flattened_batch.norm(dim=1, p=2)
 #         flattened_batch /= batch_norm[:, None]
-        return flattened_batch / self.scaling_factor
+        return flattened_batch / self.scaling_factor \
+                if self.normalize_data else flattened_batch
 
     
     def denormalize(self, batch):
-        return batch * self.scaling_factor
+        return batch * self.scaling_factor \
+                if self.normalize_data else batch
 
+    
+    def calculate_scaling_factor(self, data_loader):
+        print(f'Calculating norm mean of training set')
+        norms = []
+        self.model.eval()
+        n_batches = len(data_loader)
+        for batch_idx, (data, _) in enumerate(data_loader):
+            batch_size = len(data)
+            flattened_batch = data.view(batch_size, -1)
+            batch_norm = flattened_batch.norm(dim=1, p=2)
+            norms.extend(list(batch_norm.numpy()))
+        norms = pd.Series(norms)
+        print(norms.describe())
+        self.scaling_factor = norms.mean()
+        print('Done!\n')
+    
     
     # Run training iterations and report results
     def train(self, train_loader, epoch):
@@ -122,32 +142,16 @@ class VariationalBaseModel():
         pass
     
     
-    def calculate_scaling_factor(self, data_loader):
-        print(f'Calculating norm mean of training set')
-        norms = []
-        self.model.eval()
-        n_batches = len(data_loader)
-        for batch_idx, (data, _) in tqdm(enumerate(data_loader), total=n_batches):
-            batch_size = len(data)
-            flattened_batch = data.view(batch_size, -1)
-            batch_norm = flattened_batch.norm(dim=1, p=2)
-            norms.extend(list(batch_norm.numpy()))
-        norms = pd.Series(norms)
-        print(norms.describe())
-        self.scaling_factor = norms.mean()
-        print('Done!\n')
-    
-    
     def run_training(self, train_loader, test_loader, epochs, 
-                     report_interval, sample_sz=64,
+                     report_interval, sample_sz=64, reload_model=True,
                      checkpoints_path='../results/checkpoints',
                      logs_path='../results/logs',
                      images_path='../results/images'):
         
+        if self.normalize_data:
+            self.calculate_scaling_factor(train_loader)
         
-        self.calculate_scaling_factor(train_loader)
-        
-        start_epoch = self.load_last_model(checkpoints_path)
+        start_epoch = self.load_last_model(checkpoints_path) if reload_model else 1
         name = self.model.__class__.__name__
         run_name = f'{name}_{self.dataset}_{start_epoch}_{epochs}_' \
                    f'{self.latent_sz}_{str(self.lr).replace(".", "-")}'
@@ -169,8 +173,8 @@ class VariationalBaseModel():
                     sample = self.model.decode(sample).cpu()
                     sample = self.denormalize(sample)
                     ## Store sample plots
-                    save_image(sample.view(sample_sz, self.channels, self.width,
-                                           self.height),
+                    save_image(sample.view(sample_sz, self.channels, self.height,
+                                           self.width),
                                f'{images_path}/sample_{run_name}_{epoch}.png')
                     ## Store Model
                     torch.save(self.model.state_dict(), 
