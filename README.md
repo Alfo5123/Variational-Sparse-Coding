@@ -30,18 +30,11 @@ MNIST               |  Fashion-MNIST               |
 ![](results/images/Mnist-traversal.png)  |  ![](results/images/Fashion-traversal.png) 
 
 
-<table style="display: table;">
-<thead>
-<tr>
-<th align="center">CelebA</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center"><a target="_blank" rel="noopener noreferrer" href="/Alfo5123/Variational-Sparse-Coding/blob/master/results/images/CelebA_Traversal.png"><img src="/Alfo5123/Variational-Sparse-Coding/raw/master/results/images/CelebA_Traversal.png" height="400px" style="max-width:100%;"></a></td>
-</tr>
-</tbody>
-</table>
+<div align="center">
+  <p style="font-weight: 600;">CelebA</p><br>
+  <img src="results/images/CelebA_Traversal.png" height="400px">
+  <br><br>
+</div>
 
 **Playing with low-dimensional latent space variables**
 
