@@ -31,9 +31,10 @@ MNIST               |  Fashion-MNIST               |
 
 
 <div align="center">
-  <p style="font-weight: 600;">CelebA</p><br>
-  <img src="results/images/CelebA_Traversal.png" height="400px">
-  <br><br>
+  <b>CelebA</b> 
+  <br>
+  <img src="results/images/CelebA_Traversal.png" height="400px"/>
+  <br>
 </div>
 
 **Playing with low-dimensional latent space variables**
