@@ -1,7 +1,7 @@
 import argparse, os
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from .datasets import CelebA
+from .datasets import CelebA, DSprites
 
 
 def get_argparser(description):
@@ -52,6 +52,10 @@ def get_datasets(dataset, batch_size, cuda, root='../data'):
         Dataset = CelebA
         dataset_path = os.path.join(root, 'celeba')
         width, height, channels = 32, 32, 3
+    elif dataset == 'dsprites':
+        Dataset = DSprites
+        dataset_path = os.path.join(root, 'dsprites')
+        width, height, channels = 64, 64, 1
     else:
         raise ValueError('Dataset not supported')
 
