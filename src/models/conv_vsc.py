@@ -37,7 +37,6 @@ class ConvVSC(nn.Module):
         self.conv_output_sz = (self.channel_szs[-1], conv_out_channels, 
                                conv_out_channels)
         self.flat_conv_output_sz = np.prod(self.conv_output_sz)
-#         print(self.conv_output_sz, self.flat_conv_output_sz)
         
         self.features_to_hidden = nn.Sequential(
             nn.Linear(self.flat_conv_output_sz, hidden_sz),
@@ -70,10 +69,8 @@ class ConvVSC(nn.Module):
         # Recognition function
         # x shape: (batch_sz, n_channels, width)
         features = self.conv_encoder(x)
-#         print('encoder features', features.shape)
         features = features.view(-1, self.flat_conv_output_sz)
         hidden = self.features_to_hidden(features)
-#         print('encoder hidden', hidden.shape)
         return self.fc_mean(hidden), self.fc_logvar(hidden), \
                -F.relu(-self.fc_logspike(hidden))
 
@@ -87,11 +84,8 @@ class ConvVSC(nn.Module):
 
     def decode(self, z):
         #Likelihood function
-#         print('latent', z.shape)
         features = self.latent_to_features(z)
-#         print('decoder features', features.shape)
         features = features.view(-1, *self.conv_output_sz)
-#         print('decoder 2D features ', features.shape)
         return self.conv_decoder(features)
 
     def forward(self, x):
