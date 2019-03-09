@@ -52,9 +52,9 @@ class VAE(nn.Module):
 class VariationalAutoEncoder(VariationalBaseModel):
     def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
                  learning_rate, device, log_interval, normalize):
-        super().__init__(dataset, width, height, channels, hidden_sz, latent_sz,
+        super().__init__(dataset, width, height, channels, latent_sz,
                          learning_rate, device, log_interval, normalize)
-        
+        self.hidden_sz = [int(hs) for hs in str(hidden_sz).split(',')]
         self.model = VAE(self.input_sz, self.hidden_sz, latent_sz).to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
     

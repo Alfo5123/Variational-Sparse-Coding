@@ -8,14 +8,13 @@ from tqdm import tqdm
 from ..logger import Logger
 
 class VariationalBaseModel():
-    def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
+    def __init__(self, dataset, width, height, channels, latent_sz, 
                  learning_rate, device, log_interval, normalize):
         self.dataset = dataset
         self.width = width
         self.height = height
         self.channels = channels
         self.input_sz = width * height * channels
-        self.hidden_sz = [int(hs) for hs in str(hidden_sz).split(',')]
         self.latent_sz = latent_sz
         
         self.lr = learning_rate
