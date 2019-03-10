@@ -13,14 +13,21 @@ class ConvVSC(nn.Module):
     def __init__(self, input_sz: Tuple[int, int, int] = (3, 64, 64), 
                  kernel_szs: List[int] = [32, 32, 64, 64], 
                  hidden_sz: int = 256,
-                 latent_sz: int = 32):
+                 latent_sz: int = 32,
+                 c: float = 50,
+                 c_delta: float = 0.001,
+                 beta: float = 0.1,
+                 beta_delta: float = 0):
         
         super(ConvVSC, self).__init__()
-        self.input_sz = input_sz 
+        self.input_sz = input_sz
         self.channel_szs = [input_sz[0]] + kernel_szs 
         self.hidden_sz = hidden_sz
         self.latent_sz = latent_sz
-        self.c = 50.0
+        self.c = c
+        self.c_delta = c_delta
+        self.beta = beta
+        self.beta_delta = beta_delta
         
         conv_modules = [(
             nn.Conv2d(self.channel_szs[i], self.channel_szs[i+1], 
@@ -93,30 +100,37 @@ class ConvVSC(nn.Module):
         z = self.reparameterize(mu, logvar, logspike)
         return self.decode(z), mu, logvar, logspike
     
-    def update_c(self, delta):
-        #Gradually increase c
-        self.c += delta    
+    def update_c(self):
+        # Gradually increase c
+        self.c += self.c_delta  
+    
+    def update_beta(self):
+        # Gradually adjust beta
+        self.beta += self.beta_delta
 
     
 class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
-    def __init__(self, dataset, width, height, channels, kernels_szs,
-                 hidden_sz, latent_sz, 
-                 learning_rate, alpha, device, log_interval, normalize):
+    def __init__(self, dataset, width, height, channels, kernel_szs,
+                 hidden_sz, latent_sz, learning_rate, alpha,
+                 device, log_interval, normalize, flatten, **kwargs):
         super().__init__(dataset, width, height, channels, latent_sz,
-                         learning_rate, device, log_interval, normalize)
+                         learning_rate, device, log_interval, normalize, 
+                         flatten)
         self.alpha = alpha
         self.hidden_sz = int(hidden_sz)
         self.kernel_szs = [int(ks) for ks in str(kernel_szs).split(',')]
         
         self.model = ConvVSC(self.input_sz, self.kernel_szs, self.hidden_sz,
-                             latent_sz).to(device)
+                             latent_sz, **kwargs).to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
     
     
     # Reconstruction + KL divergence losses summed over all elements of batch
     def loss_function(self, x, recon_x, mu, logvar, logspike):
         # Reconstruction term sum (mean?) per batch
-        BCE = F.binary_cross_entropy(recon_x, x.view(-1, self.input_sz),
+        flat_input_sz = np.prod(self.input_sz)
+        BCE = F.binary_cross_entropy(recon_x.view(-1, flat_input_sz), 
+                                     x.view(-1, flat_input_sz),
                                      size_average = False)
         # see Appendix B from VSC paper / Formula 6
         spike = torch.clamp(logspike.exp(), 1e-6, 1.0 - 1e-6) 
@@ -125,10 +139,11 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
                        torch.sum((1 - spike).mul(torch.log((1 - spike) \
                                                 /(1 - self.alpha))) + \
                        spike.mul(torch.log(spike/self.alpha)))
-        return BCE + PRIOR
+        return BCE + self.model.beta * PRIOR
     
     
     def update_(self):
         # Update value of c gradually 200 ( 150 / 20K = 0.0075 )
-        self.model.update_c(0.001)
-    
+        self.model.update_c()
+        self.model.update_beta()
+        

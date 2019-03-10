@@ -9,7 +9,7 @@ class CelebA(Dataset):
                  transform=None, random_state=42, train_size=100_000, 
                  test_size=20_000):
         self.random_state = random_state
-        self.dataset_path = os.path.join(dataset_path, 'preprocessed')
+        self.dataset_path = os.path.join(dataset_path)
         self.image_files = np.array(os.listdir(self.dataset_path))
         self.train_size = train_size
         self.test_size = test_size

@@ -50,8 +50,12 @@ def get_datasets(dataset, batch_size, cuda, root='../data'):
         width, height, channels = 28, 28, 1
     elif dataset == 'celeba':
         Dataset = CelebA
-        dataset_path = os.path.join(root, 'celeba')
+        dataset_path = os.path.join(root, 'celeba/preprocessed')
         width, height, channels = 32, 32, 3
+    elif dataset == 'celeba64':
+        Dataset = CelebA
+        dataset_path = os.path.join(root, 'celeba/preprocessed64')
+        width, height, channels = 64, 64, 3
     elif dataset == 'dsprites':
         Dataset = DSprites
         dataset_path = os.path.join(root, 'dsprites')

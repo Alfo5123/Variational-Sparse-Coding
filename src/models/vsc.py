@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
@@ -62,11 +63,12 @@ class VSC(nn.Module):
     
 class VariationalSparseCoding(VariationalBaseModel):
     def __init__(self, dataset, width, height, channels, hidden_sz, latent_sz, 
-                 learning_rate, alpha, device, log_interval, normalize):
+                 learning_rate, alpha, device, log_interval, normalize, flatten):
         super().__init__(dataset, width, height, channels, latent_sz,
-                         learning_rate, device, log_interval, normalize)
+                         learning_rate, device, log_interval, normalize, flatten)
         
         self.alpha = alpha
+        self.input_sz = np.prod(self.input_sz)
         self.hidden_sz = [int(hs) for hs in str(hidden_sz).split(',')]
         self.model = VSC(self.input_sz, self.hidden_sz, latent_sz).to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)

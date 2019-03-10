@@ -9,18 +9,21 @@ from ..logger import Logger
 
 class VariationalBaseModel():
     def __init__(self, dataset, width, height, channels, latent_sz, 
-                 learning_rate, device, log_interval, normalize):
+                 learning_rate, device, log_interval, normalize=False, 
+                 flatten=True):
         self.dataset = dataset
         self.width = width
         self.height = height
         self.channels = channels
-        self.input_sz = width * height * channels
+        # before width * height * channels
+        self.input_sz = (channels, width, height)
         self.latent_sz = latent_sz
         
         self.lr = learning_rate
         self.device = device
         self.log_interval = log_interval
         self.normalize_data = normalize
+        self.flatten_data = flatten
         
         # To be implemented by subclasses
         self.model = None
@@ -41,21 +44,20 @@ class VariationalBaseModel():
             self.optimizer.step()
         return loss.item()
     
-
     # TODO: Perform transformations inside DataLoader (extend datasets.MNIST)
-    def normalize(self, batch):
-        batch_size = len(batch)
-        flattened_batch = batch.view(batch_size, -1)
+    def transform(self, batch):
+        if self.flatten_data: 
+            batch_size = len(batch)
+            batch = batch.view(batch_size, -1)
+        if self.normalize_data:
+            batch = batch / self.scaling_factor
 #         batch_norm = flattened_batch.norm(dim=1, p=2)
 #         flattened_batch /= batch_norm[:, None]
-        return flattened_batch / self.scaling_factor \
-                if self.normalize_data else flattened_batch
-
-    
-    def denormalize(self, batch):
+        return batch
+        
+    def inverse_transform(self, batch):
         return batch * self.scaling_factor \
                 if self.normalize_data else batch
-
     
     def calculate_scaling_factor(self, data_loader):
         print(f'Calculating norm mean of training set')
@@ -78,7 +80,7 @@ class VariationalBaseModel():
         self.model.train()
         train_loss = 0
         for batch_idx, (data, _) in enumerate(train_loader):
-            data = self.normalize(data).to(self.device)
+            data = self.transform(data).to(self.device)
             loss = self.step(data, train=True)
             train_loss += loss
             if batch_idx % self.log_interval == 0:
@@ -98,7 +100,7 @@ class VariationalBaseModel():
         test_loss = 0
         with torch.no_grad():
             for data, _ in test_loader:
-                data = self.normalize(data).to(self.device)
+                data = self.transform(data).to(self.device)
                 test_loss += self.step(data, train=False)
                 
         VLB = test_loss / len(test_loader)
@@ -170,7 +172,7 @@ class VariationalBaseModel():
                     sample = torch.randn(sample_sz, self.latent_sz) \
                                   .to(self.device)
                     sample = self.model.decode(sample).cpu()
-                    sample = self.denormalize(sample)
+                    sample = self.inverse_transform(sample)
                     ## Store sample plots
                     save_image(sample.view(sample_sz, self.channels, self.height,
                                            self.width),
