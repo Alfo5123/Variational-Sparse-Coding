@@ -147,9 +147,7 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
             'BCE': BCE,
             'PRIOR': PRIOR,
             'prior1': prior1,
-            'prior2': prior2,
-            'prior21': prior21.sum(),
-            'prior22': prior22.sum()
+            'prior2': prior2
         }
 
         if self.train:
