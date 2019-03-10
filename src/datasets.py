@@ -45,7 +45,7 @@ class DSprites(Dataset):
         self.dataset_path = dataset_path
         images = np.load(os.path.join(dataset_path,
                 'dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz'))['imgs']
-        self.images = images[..., None]
+        self.images = images[..., None] * 255
         self.train_size = train_size
         self.test_size = test_size
         self.transform = transform

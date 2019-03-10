@@ -123,10 +123,12 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
         self.model = ConvVSC(self.input_sz, self.kernel_szs, self.hidden_sz,
                              latent_sz, **kwargs).to(device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self.train_losses = []
+        self.test_losses = []
     
     
     # Reconstruction + KL divergence losses summed over all elements of batch
-    def loss_function(self, x, recon_x, mu, logvar, logspike):
+    def loss_function(self, x, recon_x, mu, logvar, logspike, train=False):
         # Reconstruction term sum (mean?) per batch
         flat_input_sz = np.prod(self.input_sz)
         BCE = F.binary_cross_entropy(recon_x.view(-1, flat_input_sz), 
@@ -134,11 +136,27 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
                                      size_average = False)
         # see Appendix B from VSC paper / Formula 6
         spike = torch.clamp(logspike.exp(), 1e-6, 1.0 - 1e-6) 
-        PRIOR = -0.5 * torch.sum(spike.mul(1 + logvar - mu.pow(2) \
-                                           - logvar.exp())) + \
-                       torch.sum((1 - spike).mul(torch.log((1 - spike) \
-                                                /(1 - self.alpha))) + \
-                       spike.mul(torch.log(spike/self.alpha)))
+
+        prior1 = -0.5 * torch.sum(spike.mul(1 + logvar - mu.pow(2) - logvar.exp()))
+        prior21 = (1 - spike).mul(torch.log((1 - spike) / (1 - self.alpha)))
+        prior22 = spike.mul(torch.log(spike / self.alpha))
+        prior2 = torch.sum(prior21 + prior22)
+        PRIOR = prior1 + prior2
+
+        log = {
+            'BCE': BCE,
+            'PRIOR': PRIOR,
+            'prior1': prior1,
+            'prior2': prior2,
+            'prior21': prior21,
+            'prior22': prior22
+        }
+
+        if self.train:
+            self.train_losses.append(log)
+        else:
+            self.test_losses.append(log)
+
         return BCE + self.model.beta * PRIOR
     
     

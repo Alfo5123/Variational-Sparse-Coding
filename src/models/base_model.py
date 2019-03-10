@@ -38,7 +38,7 @@ class VariationalBaseModel():
         if train:
             self.optimizer.zero_grad()
         output = self.model(data)
-        loss = self.loss_function(data, *output)
+        loss = self.loss_function(data, *output, train)
         if train:
             loss.backward()
             self.optimizer.step()
