@@ -143,11 +143,13 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
         prior2 = torch.sum(prior21 + prior22)
         PRIOR = prior1 + prior2
 
+        LOSS = BCE + self.model.beta * PRIOR
         log = {
-            'BCE': BCE,
-            'PRIOR': PRIOR,
-            'prior1': prior1,
-            'prior2': prior2
+            'LOSS': LOSS.item(),
+            'BCE': BCE.item(),
+            'PRIOR': PRIOR.item(),
+            'prior1': prior1.item(),
+            'prior2': prior2.item()
         }
 
         if self.train:
@@ -155,7 +157,7 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
         else:
             self.test_losses.append(log)
 
-        return BCE + self.model.beta * PRIOR
+        return LOSS
     
     
     def update_(self):
