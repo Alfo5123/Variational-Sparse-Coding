@@ -38,7 +38,7 @@ class VariationalBaseModel():
         if train:
             self.optimizer.zero_grad()
         output = self.model(data)
-        loss = self.loss_function(data, *output, train)
+        loss = self.loss_function(data, *output, train=train)
         if train:
             loss.backward()
             self.optimizer.step()
@@ -76,7 +76,7 @@ class VariationalBaseModel():
     
     
     # Run training iterations and report results
-    def train(self, train_loader, epoch):
+    def train(self, train_loader, epoch, logging_func=print):
         self.model.train()
         train_loss = 0
         for batch_idx, (data, _) in enumerate(train_loader):
@@ -84,18 +84,18 @@ class VariationalBaseModel():
             loss = self.step(data, train=True)
             train_loss += loss
             if batch_idx % self.log_interval == 0:
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}' \
+                logging_func('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}' \
                       .format(epoch, batch_idx * len(data), 
                               len(train_loader.dataset),
                               100. * batch_idx / len(train_loader),
                               loss / len(data)))
 
-        print('====> Epoch: {} Average loss: {:.4f}'.format(
+        logging_func('====> Epoch: {} Average loss: {:.4f}'.format(
               epoch, train_loss / len(train_loader.dataset)))
         
         
     # Returns the VLB for the test set
-    def test(self, test_loader, epoch):
+    def test(self, test_loader, epoch, logging_func=print):
         self.model.eval()
         test_loss = 0
         with torch.no_grad():
@@ -107,12 +107,12 @@ class VariationalBaseModel():
         ## Optional to normalize VLB on testset
         name = self.model.__class__.__name__
         test_loss /= len(test_loader.dataset) 
-        print(f'====> Test set loss: {test_loss:.4f} - VLB-{name} : {VLB:.4f}')
+        logging_func(f'====> Test set loss: {test_loss:.4f} - VLB-{name} : {VLB:.4f}')
         return test_loss
     
     
     #Auxiliary function to continue training from last trained models
-    def load_last_model(self, checkpoints_path):
+    def load_last_model(self, checkpoints_path, logging_func=print):
         name = self.model.__class__.__name__
         # Search for all previous checkpoints
         models = glob(f'{checkpoints_path}/*.pth')
@@ -127,14 +127,14 @@ class VariationalBaseModel():
                 
         # If no checkpoints available
         if len(model_ids) == 0:
-            print(f'Training {name} model from scratch...')
+            logging_func(f'Training {name} model from scratch...')
             return 1
 
         # Load model from last checkpoint 
         start_epoch, last_checkpoint = max(model_ids, key=lambda item: item[0])
-        print('Last checkpoint: ', last_checkpoint)
+        logging_func('Last checkpoint: ', last_checkpoint)
         self.model.load_state_dict(torch.load(last_checkpoint))
-        print(f'Loading {name} model from last checkpoint ({start_epoch})...')
+        logging_func(f'Loading {name} model from last checkpoint ({start_epoch})...')
 
         return start_epoch + 1
     
@@ -147,20 +147,23 @@ class VariationalBaseModel():
                      report_interval, sample_sz=64, reload_model=True,
                      checkpoints_path='../results/checkpoints',
                      logs_path='../results/logs',
-                     images_path='../results/images'):
+                     images_path='../results/images',
+                     logging_func=print, start_epoch=None):
         
         if self.normalize_data:
             self.calculate_scaling_factor(train_loader)
         
-        start_epoch = self.load_last_model(checkpoints_path) if reload_model else 1
+        if start_epoch is None:
+            start_epoch = self.load_last_model(checkpoints_path, logging_func) \
+                                           if reload_model else 1
         name = self.model.__class__.__name__
         run_name = f'{name}_{self.dataset}_{start_epoch}_{epochs}_' \
                    f'{self.latent_sz}_{str(self.lr).replace(".", "-")}'
         logger = Logger(f'{logs_path}/{run_name}')
-        print(f'Training {name} model...')
+        logging_func(f'Training {name} model...')
         for epoch in range(start_epoch, start_epoch + epochs):
-            train_loss = self.train(train_loader, epoch)
-            test_loss = self.test(test_loader, epoch)
+            train_loss = self.train(train_loader, epoch, logging_func)
+            test_loss = self.test(test_loader, epoch, logging_func)
             # Store log
             logger.scalar_summary(train_loss, test_loss, epoch)
             # Optional update
