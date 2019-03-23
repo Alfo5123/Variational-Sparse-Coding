@@ -152,7 +152,7 @@ class ConvolutionalVariationalSparseCoding(VariationalBaseModel):
             'prior2': prior2.item()
         }
 
-        if self.train:
+        if train:
             self.train_losses.append(log)
         else:
             self.test_losses.append(log)
