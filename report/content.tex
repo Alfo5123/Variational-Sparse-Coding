@@ -1,0 +1,104 @@
+
+Three years, we launched ReScience, a new scientific journal aimed at publishing the
+replication of existing computational research. Since ReScience published its first
+article\supercite{Topalidou:2015}, things have been
+going steadily. We are still alive, independent and without a budget. In the
+meantime, we have published around 24 articles (mostly in computational
+neuroscience \& computational ecology) and the initial
+\href{https://rescience-c.github.io/board/}{editorial board} has grown from
+around 10 to roughly 100 members (editors and reviewers), we have advertised
+ReScience at several conferences worldwide, gave some
+interviews\supercite{Science:2018}, and published an article introducing
+ReScience in PeerJ~CS\supercite{Rougier:2017}. Based on our
+experience\supercite{Rougier:2018} at managing the journal during these three
+years, we think that time is ripe for some changes.
+
+\subsubsection{ReScience C \& ReScience X}
+
+The biggest and most visible change we would like to propose is to change the
+name of the journal ``ReScience'' in favor of ``ReScience C'' where the C
+stands for (c)omputational. This change would be necessary to have consistent
+naming with the upcoming creation of the ``ReScience X'' journal that will be
+dedicated to e(x)perimental replications and co-directed by E.Roesch
+(University of Reading) and N.Rougier (University of Bordeaux). The name
+``ReScience'' would then be used for the name of a non-profit organization
+(that is yet to be created) for the two journals as well as future journals
+(such as the utopian CoScience\supercite{Rougier:2017} or a future and
+tentative ``ReScience T'' for theoretical science).
+
+
+\subsubsection{A new submission process}
+
+The current submission process requires authors to fork, clone and branch the
+submission repository in order to write their article and to place code and
+data at the relevant places in the forked repository. Once done, authors have
+to push their changes and to make a pull request that is considered as a
+submission. This process is cumbersome for authors and has induced many
+troubles for editors as well once the article is accepted and ready to be
+published, mostly because of the complexity of the editing procedure. In order
+to make life easier for everyone, we greatly simplified the submission process
+for ReScience C and X. Authors are now responsible for getting a DOI for their
+code \& data and only have to submit a PDF and a metadata file in a GitHub
+issue.
+We also provide Python programs that largely automate the subsequent editing
+process. We will still archive the submission on Zenodo but this archive will
+be made for the final PDF only. However, both the PDF and the Zenodo entry will
+contain all associated DOIs (data and code).
+
+
+\subsubsection{A simplified publishing process}
+
+In ReScience, we have have been using a combination of
+\href{https://daringfireball.net/projects/markdown/syntax}{markdown} and
+\href{http://pandoc.org/}{pandoc} for producing both the draft and the final
+version of all the published articles. This had worked reasonably well until it
+started to cause all kind of problems for both authors and editors, especially
+with the reference and citation plugins. Consequently, articles will be now
+submitted directly in PDF with accompanying metadata in a separate file using
+the \href{https://en.wikipedia.org/wiki/YAML}{YAML} format (they were
+previously embedded in the markdown file). Once an article has been accepted,
+authors will be responsible for updating the metadata and for rebuilding the PDF if
+necessary. We could also consider using the
+\href{https://github.com/openjournals/whedon}{Whedon} API that helps with automating
+most of the editorial tasks for \href{http://joss.theoj.org/}{JOSS} and
+\href{http://jose.theoj.org/}{JOSE}. This will most probably require some
+tweaking because our publishing pipeline is a bit different.
+
+
+\subsubsection{A new design}
+
+The combination of markdown and pandoc has also severely limited the layout and
+style possibilities for the article template and since we are switching to
+\LaTeX, this is the opportunity to propose a new design based on a more elegant
+style, using a new font stack\supercite{SourceSerifPro:2014, Roboto:2011,
+  SourceCodePro:2012} (you are currently reading it). The goal is to have a
+subtle but strong identity with enhanced readability. Considering that articles
+will be mostly read on screen (as opposed to printed), we can benefit from a
+more ethereal style. Once this design will have stabilized, an
+\href{https://www.overleaf.com/}{overleaf} template will be made available for
+those without a \TeX~installation. If a \TeX~expert is ready to help review
+the template (and possibly rewrite it as a class), their help would be much
+welcome and appreciated. The same holds for LibreOffice, Word or Pages, any
+template is welcome, just contact us beforehand such that we can coordinate
+efforts.
+
+
+\subsubsection{Editorials, letters and special issues}
+
+ReScience C remains dedicated to the publication of computational replications
+but we (i.e., the editorial team) would like to have the opportunity to
+publish \emph{editorials} when deemed necessary and to give anyone the
+opportunity to write \emph{letters} to the community on a specific topic
+related to reproducibility. Both editorials and letters are expected to be 1 or
+2 pages long (but no hard limit will be enforced), will be (quickly) peer reviewed,
+and will be assigned a DOI. Furthermore, with the advent of reproducibility
+hackatons worldwide, we will host {\em special issues} with guest editors (such
+as, for example, the organizers of a hackaton) in order to publish the results
+and to enhance their discoverability. Each entry will have to go through the
+regular open peer-reviewed pipeline.\\
+
+
+We hope that most readers will agree on the proposed changes such that we can
+commit to them in the next few weeks. The review for this editorial is open (as
+usual) and anyone can comment on and/or oppose any of the proposed changes. New
+ideas are also welcome.
