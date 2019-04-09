@@ -1,3 +1,4 @@
+
 \section{Introduction}
 
 The paper \supercite{tonolini2019variational} proposes an improvement over the Variational Auto-Encoder (VAE) architecture  \supercite{Rezende2014, Kingma2013} by explicitly modelling sparsity in the latent space with a Spike and Slab prior distribution and drawing ideas from sparse coding theory. The main motivation behind their work lies in the ability to infer truly sparse representations from generally intractable non-linear probabilistic models, simultaneously addressing the problem of lack of interpretability of latent features. Moreover, the proposed model improves the classification accuracy using the low-dimensional representations obtained, and significantly adds robustness while varying the dimensionality of latent space. \\
@@ -10,7 +11,7 @@ In this reproducibility report we study in detail the VSC model to implement the
 
 Variational Auto-Encoders have been extensively studied \supercite{Doersch2016} and widely modified in the recent years in order to encourage certain behavior of the latent space variables \supercite{Nalisnick2016, rolfe2016discrete, casale2018gaussian} or to be further applied for particular tasks \supercite{chen2016variational,walker2016uncertain, kusner2017grammar, jin2018junction}. Regarding the sparsity of the latent space for VAEs, previous work in the literature has focused on either explicitly incorporating a regularization term to benefit sparsity \supercite{louizos2017learning}, or fixing a prior distribution, such as Rectified Gaussians by \supercite{salimans2016structured},  discrete distributions by \supercite{van2017neural}, student-t distribution for Variational Information Bottleneck by \supercite{Chalk2016} and Stick Breaking Processes by \supercite{Nalisnick2016}. \\
 
-Nonetheless, previous works have not allowed to explicitly model sparsity by incorporating linear sparse coding to non-linear probabilistic generative models.  The paper we aim to reproduce, offers a connection between both areas through the  Spike-and-Slab distribution, chosen as a prior distribution for the latent variables. Although this distribution has been commonly used for modeling sparsity \supercite{Goodfellow2012}, it has rarely been applied to generative models. Moreover, since sparse coding imposes efficient data representations \supercite{ishwaran2005spike, titsias2011spike, bengio2013representation}, the authors demonstrate qualitatively how the sparse learned representations can capture subjectively understandable sources of variation. \\
+Nonetheless, previous works have not allowed to explicitly model sparsity by incorporating linear sparse coding to non-linear probabilistic generative models.  The paper we aim to reproduce offers a connection between both areas through the  Spike-and-Slab distribution, chosen as a prior distribution for the latent variables. Although this distribution has been commonly used for modeling sparsity \supercite{Goodfellow2012}, it has rarely been applied to generative models. Moreover, since sparse coding imposes efficient data representations \supercite{ishwaran2005spike, titsias2011spike, bengio2013representation}, the authors demonstrate qualitatively how the sparse learned representations can capture subjectively understandable sources of variation. \\
 
 Following the line of latent features interpretability, we can observe that the authors' idea is closely related to the Epitomic VAE by \supercite{yeung2016epitomic}, which learns the latent dimensions the recognition function should exploit. Many recent approaches, mostly related to disentangled representations, such as  $\beta$-VAE  \supercite{higgins2016beta, Burgess2018} or Factor-VAE by \supercite{Kim2018}, focus on learning interpretable factorized representations of the independent data generative factors via generative models. However, these approaches although explicitly induce interpretation of the latent features, do not directly produce sparse representations in contrast with the VSC model. Hence, the authors' aim is to develop a model that directly induces sparsity in a continuous latent space, which in addition, results into a higher expectation of interpretability in large latent spaces. \\
 
@@ -42,7 +43,7 @@ We found that the paper was well written and moderately amenable for reproductio
 
 We test the VSC model in two commonly used image datasets: MNIST \supercite{lecun1998gradient} and Fashion-MNIST \supercite{xiao2017fashion}, both composed of $28 \times 28$ grey scale images of handwritten digits and pieces of clothing respectively. Following the paper description, we run most of the experiments with these datasets. In addition to this, CelebA faces \supercite{liu2015deep} dataset was used to showcase qualitative results. We include in our repository routines to download and preprocess the datasets.
 
-\textbf{Observations}
+\subsubsection{Observations}
 
 \begin{itemize}
     \item For the CelebA dataset, we used a subset of 100K samples for training and 20K samples for testing, which were center cropped and downsampled to a size of $32 \times 32$ using all $3$ RGB channels, as described in the paper. 
@@ -59,11 +60,11 @@ For the loss function, the authors used a continuous relaxation for the discrete
 
 We stored all the checkpoints for the trained models, for reproducibility purposes, together with the training logs which can be visualized using TensorBoard.
 
-\textsc{Observations}
+\subsubsection{Observations}
 \begin{itemize}
     \item One of the missing details in the paper was the batch size. We assumed it to be $32$ samples per batch, due to our memory restrictions. 
     \item The original paper suggests using $20,000$ iterations for model training using the ADAM optimizer \supercite{kingma2014adam} with learning rate ranging between $0.001$ and $0.01$. In particular, we implemented the VSC model in a way that the number of epochs is one hyperparameter. Thus, we fixed the number of epochs to be equivalent the number of iterations given by the paper; i.e., for MNIST and Fashion-MNIST we trained the VSC model for $11$ epochs with a batch size of $32$. We fixed a learning rate of $0.001$.
-    \item A minor downside of the paper is that the weights initialization method was not specified.
+    \item A minor downside of the paper is that the weights initialization method was not specified. We initialized the weights with uniform random variables using the Kaiming initialization method \supercite{Kaiming2015} for all the layers, which is also the default method for linear layers in PyTorch.
     \item For the recognition function, in order to avoid numerical instability, we suggest to either use $\textit{clamp}$ or Sigmoid activation function to avoid spike values of zero (thus ensuring $\gamma_i < 1$).
 \end{itemize}
 
@@ -134,7 +135,7 @@ Authors claim the interpretability of the sparse learned representations. We qua
 \end{figure}
 
 \subsection{Visualization / Traversing Latent Space}
-We explored how sampling from the latent space distribution can allow us to obtain interpretable variations in the generated images (Figure \ref{fig:traversals}), and also how conditional sampling produces arguably realistic new samples from the same conceptual entity. (Figure \ref{fig:conditional}). The traversal of the latent space is performed varying the latent codes with a high absolute value for a given image, one at a time. We can observe that these latent codes indeed represent interpretable features of the datasets, such as the digits shape in MNIST, the color and shape of the clothes in Fashion-MNIST and the orientation, background color, skin color and hair color in the CelebA results.
+We explored how sampling from the latent space distribution can allow us to obtain interpretable variations in the generated images (Figure \ref{fig:traversals}), and also how conditional sampling produces arguably realistic new samples from the same conceptual entity (Figure \ref{fig:conditional}). The traversal of the latent space is performed varying the latent codes with a high absolute value for a given image, one at a time. We can observe that these latent codes indeed represent interpretable features of the datasets, such as the digits shape in MNIST, the color and shape of the clothes in Fashion-MNIST and the orientation, background color, skin color and hair color in the CelebA results.
 
 \begin{figure}[!h]
     \captionsetup{justification=centering,margin=0.3cm}
