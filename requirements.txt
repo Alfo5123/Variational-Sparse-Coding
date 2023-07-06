@@ -1,5 +1,5 @@
 torchvision==0.2.1
-scipy==1.1.0
+scipy==1.10.0
 requests==2.20.0
 tqdm==4.19.5
 numpy==1.15.3
